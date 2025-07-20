@@ -3,7 +3,6 @@ from datetime import datetime
 from models import db, Idee, Utilisateur, Like, Commentaire
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, logout_user, current_user, login_user, LoginManager
-from sqlalchemy import func
 from flask_wtf import CSRFProtect
 from forms import ConnexionForm, InscriptionForm, IdeeForm, CommentaireForm
 import bleach
