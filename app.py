@@ -24,6 +24,13 @@ login_manager = LoginManager()
 login_manager.login_view = "connexion"
 login_manager.init_app(app)
 
+MAINTENANCE = True  # mettre False quand terminé
+
+if MAINTENANCE:
+    @app.before_request
+    def maintenance_mode():
+        return "<h1>Maintenance</h1><p>Agora est temporairement hors ligne. Nous revenons bientôt !</p>", 503
+
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
