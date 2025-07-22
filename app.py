@@ -8,6 +8,7 @@ from forms import ConnexionForm, InscriptionForm, IdeeForm, CommentaireForm
 import bleach
 import os
 from datetime import timedelta
+from flask_wtf.csrf import generate_csrf
 
 app = Flask(__name__)
 
@@ -311,6 +312,11 @@ def page_introuvable(e):
 @app.errorhandler(403)
 def forbidden(e):
     return render_template("403.html"), 403
+
+
+@app.context_processor
+def inject_csrf_token():
+    return dict(csrf_token=generate_csrf)
 
 
 if __name__ == '__main__':
