@@ -6,14 +6,30 @@ from flask_login import login_required, logout_user, current_user, login_user, L
 from flask_wtf import CSRFProtect
 from forms import ConnexionForm, InscriptionForm, IdeeForm, CommentaireForm
 import bleach
+import os
+from datetime import timedelta
 
 app = Flask(__name__)
-app.secret_key = "une_chaine_secrete_a_changer"  # En production, changer par une clé aléatoire forte
-csrf = CSRFProtect(app)
 
-# Configuration de la base de données SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///idees.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# --- Clé secrète ---
+# En local tu peux garder une valeur fixe. En prod, on lira dans l'env.
+app.secret_key = os.environ.get("SECRET_KEY", "une_chaine_secrete_a_changer")
+
+# --- Base de données ---
+db_url = os.environ.get("DATABASE_URL", "sqlite:///idees.db")
+
+# Render (et d’autres) fournissent parfois un DSN commençant par postgres://
+# SQLAlchemy attend postgresql:// -> on corrige si besoin.
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# --- Cookies / sessions persistants (optionnel maintenant, utile bientôt) ---
+app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
+app.config["REMEMBER_COOKIE_SECURE"] = False  # mettre True quand HTTPS
+app.config["REMEMBER_COOKIE_HTTPONLY"] = True
 
 app.config['SESSION_COOKIE_SAMESITE'] = "Lax"
 app.config['SESSION_COOKIE_SECURE'] = False  # True seulement en HTTPS
@@ -162,7 +178,7 @@ def connexion():
 
         if utilisateur and check_password_hash(utilisateur.mot_de_passe, mot_de_passe):
             print("Connexion réussie pour :", email)
-            login_user(utilisateur)
+            login_user(utilisateur, remember=True)
             print("Redirection vers / après login_user")
             return redirect(url_for("index"))
         else:
