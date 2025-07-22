@@ -320,6 +320,13 @@ def forbidden(e):
     return render_template("403.html"), 403
 
 
+@app.route("/init-db")
+def init_db_route():
+    with app.app_context():
+        db.create_all()
+    return "Tables créées dans PostgreSQL !"
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
