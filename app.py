@@ -127,7 +127,7 @@ def inscription():
     form = InscriptionForm()
 
     if form.validate_on_submit():
-        email = form.email.data.lower()
+        email = form.email.data.strip().lower()
         mot_de_passe = form.mot_de_passe.data
 
         utilisateur_existant = Utilisateur.query.filter_by(email=email).first()
@@ -165,7 +165,7 @@ def connexion():
     form = ConnexionForm()
 
     if form.validate_on_submit():
-        email = form.email.data.lower()
+        email = form.email.data.strip().lower()
         mot_de_passe = form.mot_de_passe.data
 
         utilisateur = Utilisateur.query.filter_by(email=email).first()
