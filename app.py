@@ -43,8 +43,9 @@ login_manager.init_app(app)
 
 
 @app.route("/", methods=["GET", "POST"])
-@login_required
 def index():
+    if not current_user.is_authenticated:
+        return redirect(url_for("connexion"))
     print("Connecté ? ->", current_user.is_authenticated)
     print("Utilisateur ->", current_user.email if current_user.is_authenticated else "None")
     form = IdeeForm()
