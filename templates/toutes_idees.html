@@ -136,7 +136,7 @@
                         </button>
 
 
-                    <button class="toggle-commentaires btn" data-id="{{ idee.id }}">
+                    <button class="toggle-commentaires btn" data-id="toutes-{{ idee.id }}">
                         💬 {{ idee.commentaires|length }} commentaire{{ 's' if idee.commentaires|length > 1 }}
                     </button>
                 </div>
@@ -150,7 +150,7 @@
 
                 <!-- Bloc commentaires -->
                 {% if idee.commentaires %}
-                <div class="commentaires" id="commentaires-{{ idee.id }}" style="display: none;">
+                <div class="commentaires" id="commentaires-toutes-{{ idee.id }}">
                     <strong>Commentaires :</strong>
                     {% for commentaire in idee.commentaires %}
                     <div class="commentaire">
@@ -166,13 +166,13 @@
 
 </div>
 <script>
-document.querySelectorAll(".toggle-commentaires").forEach(btn => {
+  document.querySelectorAll(".toggle-commentaires").forEach(btn => {
     btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-id");
-        const bloc = document.getElementById("commentaires-" + id);
-        bloc.style.display = bloc.style.display === "none" ? "block" : "none";
+      const id = btn.getAttribute("data-id"); // ex : "toutes-42"
+      const bloc = document.getElementById("commentaires-" + id); // ex : commentaires-toutes-42
+      bloc.style.display = bloc.style.display === "none" ? "block" : "none";
     });
-});
+  });
 </script>
 </body>
 </html>

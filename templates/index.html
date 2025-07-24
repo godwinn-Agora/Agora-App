@@ -121,7 +121,7 @@
         {% for idee in idees %}
          {% if idee.utilisateur_id == current_user.id %}
             <div class="idee">
-                <h3>{{ idee.titre }}</h3>
+                <h3>🧠 {{ idee.titre }}</h3>
                 <p>{{ idee.contenu }}</p>
                 <div class="interactions">
                     <form action="/supprimer/{{ idee.id }}" method="POST" style="display:inline-block;">
@@ -133,7 +133,43 @@
                         <button class="btn" type="submit">✏️ Modifier</button>
                     </form>
                 </div>
-                <small>Posté le {{ idee.date_creation.strftime('%d/%m/%Y %H:%M') }}</small>
+                <div class="idee">
+                 <div class="interactions">
+                    <button type="button" class="interaction-btn" data-like="{{ idee.id }}">
+                            {% if idee.likes | selectattr("utilisateur_id", "equalto", current_user.id) | list | length > 0 %}
+                                ❤️ {{ idee.likes|length }}
+                            {% else %}
+                                🤍 {{ idee.likes|length }}
+                            {% endif %}
+                        </button>
+
+
+                    <button class="toggle-commentaires btn" data-id="mes-{{ idee.id }}">
+                        💬 {{ idee.commentaires|length }} commentaire{{ 's' if idee.commentaires|length > 1 }}
+                    </button>
+                </div>
+
+                <!-- Formulaire d’ajout de commentaire -->
+                <form method="POST" action="/commentaire/{{ idee.id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <textarea name="contenu" rows="2" placeholder="Ajouter un commentaire..." required></textarea>
+                    <button class="btn" type="submit">Commenter</button>
+                </form>
+
+                <!-- Bloc commentaires -->
+                {% if idee.commentaires %}
+                <div class="commentaires" id="commentaires-mes-{{ idee.id }}">
+                    <strong>Commentaires :</strong>
+                    {% for commentaire in idee.commentaires %}
+                    <div class="commentaire">
+                        <strong>{{ commentaire.utilisateur.email }}</strong> : {{ commentaire.contenu }}<br>
+                        <small>{{ commentaire.date_commentaire.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                </div>
+                <small>Par {{ idee.utilisateur.email }} - {{ idee.date_creation.strftime('%d/%m/%Y %H:%M') }}</small>
             </div>
          {% endif %}
         {% endfor %}
@@ -157,7 +193,7 @@
                         </button>
 
 
-                    <button class="toggle-commentaires btn" data-id="{{ idee.id }}">
+                    <button class="toggle-commentaires btn" data-id="toutes-{{ idee.id }}">
                         💬 {{ idee.commentaires|length }} commentaire{{ 's' if idee.commentaires|length > 1 }}
                     </button>
                 </div>
@@ -171,7 +207,7 @@
 
                 <!-- Bloc commentaires -->
                 {% if idee.commentaires %}
-                <div class="commentaires" id="commentaires-{{ idee.id }}" style="display: none;">
+                <div class="commentaires" id="commentaires-toutes-{{ idee.id }}">
                     <strong>Commentaires :</strong>
                     {% for commentaire in idee.commentaires %}
                     <div class="commentaire">
@@ -199,12 +235,15 @@
 <script>
 document.querySelectorAll(".toggle-commentaires").forEach(btn => {
     btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-id");
+        const id = btn.getAttribute("data-id");  // ex: "mes-12" ou "toutes-5"
         const bloc = document.getElementById("commentaires-" + id);
-        bloc.style.display = bloc.style.display === "none" ? "block" : "none";
+        if (bloc) {
+            bloc.style.display = bloc.style.display === "none" ? "block" : "none";
+        }
     });
 });
 </script>
+
 
 </body>
 </html>
