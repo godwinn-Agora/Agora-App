@@ -322,4 +322,5 @@ def inject_csrf_token():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        print("✅ Tables créées automatiquement au démarrage.")
     app.run(debug=True)
