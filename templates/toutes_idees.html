@@ -1,179 +1,78 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Toutes les Idées</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"/>
-  <style>
-    :root {
-      --bleu: #004080;
-      --bleu-clair: #0066cc;
-      --gris: #f0f2f5;
-      --blanc: #ffffff;
-      --gris-clair: #f8f9fa;
-    }
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--gris);
-      color: #333;
-    }
-    .container {
-      max-width: 760px;
-      margin: auto;
-      padding: 24px 16px;
-    }
-    .btn, .interaction-btn, .toggle-commentaires {
-      background-color: transparent;
-      border: 1px solid var(--bleu);
-      color: var(--bleu);
-      font-size: 0.85em;
-      padding: 6px 10px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    .btn:hover, .interaction-btn:hover, .toggle-commentaires:hover {
-      background-color: var(--bleu);
-      color: white;
-    }
-    .idee {
-      background-color: var(--blanc);
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    .idee h3 {
-      margin-top: 0;
-    }
-    .idee small {
-      color: #666;
-    }
-    .commentaire {
-      background-color: var(--gris-clair);
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      resize: none;
-    }
-    .interactions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    .commentaires-repliables {
-      display: none;
-      margin-top: 10px;
-    }
-    .flash {
-      padding: 10px 16px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      color: #fff;
-    }
-    .flash.success { background-color: #28a745; }
-    .flash.error { background-color: #dc3545; }
-  </style>
-</head>
-<body>
-{% include "base.html" %}
+{% extends "base.html" %}
+
+{% block title %}Toutes les Idées – Agora{% endblock %}
+
 {% block content %}
-{% endblock %}
 
-<div class="container">
+  {% if current_user.is_authenticated %}
+    <form method="POST" action="/" class="mb-8 bg-white p-6 rounded-lg shadow">
+      {{ form.hidden_tag() }}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+      <label for="{{ form.titre.id }}" class="block mb-1 font-semibold text-blue-900">
+        {{ form.titre.label.text }}
+      </label>
+      {{ form.titre(class="w-full p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500") }}
 
-    {% if current_user.is_authenticated %}
-    <form method="POST" action="/">
-        {{ form.hidden_tag() }}
+      <label for="{{ form.contenu.id }}" class="block mt-4 mb-1 font-semibold text-blue-900">
+        {{ form.contenu.label.text }}
+      </label>
+      {{ form.contenu(class="w-full p-2 rounded border border-gray-300 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500") }}
 
-        <label for="{{ form.titre.id }}">{{ form.titre.label.text }}</label>
-        {{ form.titre(class="w-full p-2 rounded border border-gray-300") }}
-
-        <label for="{{ form.contenu.id }}">{{ form.contenu.label.text }}</label>
-        {{ form.contenu(class="w-full p-2 rounded border border-gray-300 mt-1") }}
-
-        {{ form.submit(class="btn mt-2") }}
+      {{ form.submit(class="mt-4 w-full bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 rounded transition") }}
     </form>
 
-    {% endif %}
+    <h2 class="text-2xl font-bold mb-6 text-blue-900">Toutes les idées</h2>
 
+    {% for idee in idees %}
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-xl font-semibold mb-1">🧠 {{ idee.titre }}</h3>
+        <small class="text-gray-600 block mb-2">
+          Par {{ idee.utilisateur.email }} – {{ idee.date_creation.strftime('%d/%m/%Y %H:%M') }}
+        </small>
+        <p class="mb-4">{{ idee.contenu }}</p>
 
-    {% if current_user.is_authenticated %}
-     <h2>Toutes les idées</h2>
-        {% for idee in idees %}
-            <div class="idee">
-                <h3>🧠 {{ idee.titre }}</h3>
-                <small>Par {{ idee.utilisateur.email }} - {{ idee.date_creation.strftime('%d/%m/%Y %H:%M') }}</small>
-                <p>{{ idee.contenu }}</p>
+        <div class="flex items-center gap-4 mb-4">
+          <button type="button"
+                  class="interaction-btn border border-blue-900 text-blue-900 px-3 py-1 rounded-full text-sm flex items-center gap-1 hover:bg-blue-900 hover:text-white transition"
+                  data-like="{{ idee.id }}">
+            {% if idee.likes | selectattr("utilisateur_id", "equalto", current_user.id) | list | length > 0 %}
+              <span>❤️</span> <span>{{ idee.likes|length }}</span>
+            {% else %}
+              <span>🤍</span> <span>{{ idee.likes|length }}</span>
+            {% endif %}
+          </button>
 
-                <div class="interactions">
-                    <button type="button" class="interaction-btn" data-like="{{ idee.id }}">
-                            {% if idee.likes | selectattr("utilisateur_id", "equalto", current_user.id) | list | length > 0 %}
-                                ❤️ {{ idee.likes|length }}
-                            {% else %}
-                                🤍 {{ idee.likes|length }}
-                            {% endif %}
-                        </button>
+          <button class="toggle-commentaires border border-blue-900 text-blue-900 px-3 py-1 rounded-full text-sm hover:bg-blue-900 hover:text-white transition"
+                  data-id="toutes-{{ idee.id }}">
+            💬 {{ idee.commentaires|length }} commentaire{{ 's' if idee.commentaires|length > 1 }}
+          </button>
+        </div>
 
+        <form method="POST" action="/commentaire/{{ idee.id }}" class="mb-4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <textarea name="contenu" rows="2" placeholder="Ajouter un commentaire..." required
+            class="w-full p-2 rounded border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          <button type="submit"
+            class="mt-2 bg-blue-900 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded w-full transition">
+            Commenter
+          </button>
+        </form>
 
-                    <button class="toggle-commentaires btn" data-id="toutes-{{ idee.id }}">
-                        💬 {{ idee.commentaires|length }} commentaire{{ 's' if idee.commentaires|length > 1 }}
-                    </button>
-                </div>
+        {% if idee.commentaires %}
+          <div class="commentaires hidden" id="commentaires-toutes-{{ idee.id }}">
+            <strong class="block mb-2">Commentaires :</strong>
+            {% for commentaire in idee.commentaires %}
+              <div class="commentaire bg-gray-100 p-3 rounded mb-2">
+                <strong>{{ commentaire.utilisateur.email }}</strong> : {{ commentaire.contenu }}<br>
+                <small class="text-gray-500">{{ commentaire.date_commentaire.strftime('%d/%m/%Y %H:%M') }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-center text-gray-600 text-lg">Veuillez vous connecter pour voir et poster des idées.</p>
+  {% endif %}
 
-                <!-- Formulaire d’ajout de commentaire -->
-                <form method="POST" action="/commentaire/{{ idee.id }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <textarea name="contenu" rows="2" placeholder="Ajouter un commentaire..." required class="w-full p-2 rounded border border-gray-300"></textarea>
-                    <button class="btn mt-2" type="submit">Commenter</button>
-                </form>
-
-                <!-- Bloc commentaires -->
-                {% if idee.commentaires %}
-                <div class="commentaires" id="commentaires-toutes-{{ idee.id }}">
-                    <strong>Commentaires :</strong>
-                    {% for commentaire in idee.commentaires %}
-                    <div class="commentaire">
-                        <strong>{{ commentaire.utilisateur.email }}</strong> : {{ commentaire.contenu }}<br>
-                        <small>{{ commentaire.date_commentaire.strftime('%d/%m/%Y %H:%M') }}</small>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-</div>
-<script>
-  document.querySelectorAll(".toggle-commentaires").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-id"); // ex : "toutes-42"
-      const bloc = document.getElementById("commentaires-" + id); // ex : commentaires-toutes-42
-      bloc.style.display = bloc.style.display === "none" ? "block" : "none";
-    });
-  });
-</script>
-</body>
-</html>
-
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div class="max-w-3xl mx-auto mt-8 p-4 bg-white rounded-xl shadow">
+  <!-- Header -->
+  <div class="flex items-center space-x-4">
+    <!-- Avatar -->
+    <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl font-bold">
+      {{ utilisateur.nom_affiche[0]|upper }}
+    </div>
+
+    <!-- Nom + Slug -->
+    <div>
+      <h1 class="text-xl font-semibold">{{ utilisateur.nom_affiche }}</h1>
+      <p class="text-gray-500">@{{ utilisateur.nom_affiche_slug }}</p>
+    </div>
+
+    <!-- Modifier le profil -->
+    {% if utilisateur.id == current_user.id %}
+      <a href="{{ url_for('edit_profil') }}" class="ml-auto bg-gray-200 hover:bg-gray-300 text-sm px-4 py-1 rounded">
+        Modifier le profil
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Bio -->
+  <div class="mt-4 text-gray-700">
+    {{ utilisateur.bio or "Cet utilisateur n’a pas encore de bio." }}
+  </div>
+
+  <!-- Séparateur -->
+  <hr class="my-6">
+
+   <!-- Idées enrichies -->
+  <h2 class="text-lg font-semibold mb-4">Idées publiées</h2>
+  {% for idee in idees %}
+    <div class="bg-white p-5 rounded-xl shadow mb-6">
+      <h3 class="text-xl font-semibold text-blue-800">🧠 {{ idee.titre }}</h3>
+      <p class="mt-2 text-gray-700">{{ idee.contenu }}</p>
+
+      <div class="text-sm text-gray-500 mt-2">
+        Créée le {{ idee.date_creation.strftime('%d/%m/%Y %H:%M') }} par {{ idee.utilisateur.email }}
+      </div>
+
+      {% if current_user.is_authenticated and current_user.id == idee.utilisateur_id %}
+        <div class="flex items-center space-x-3 mt-4">
+          <form action="/supprimer/{{ idee.id }}" method="POST" class="inline-block">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit"
+              class="border border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white px-3 py-1 rounded-full text-sm transition">
+              🗑️ Supprimer
+            </button>
+          </form>
+
+          <form action="/modifier/{{ idee.id }}/form" method="GET" class="inline-block">
+            <button
+              class="border border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white px-3 py-1 rounded-full text-sm transition"
+              type="submit">
+              ✏️ Modifier
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+      <div class="flex items-center space-x-4 mt-4">
+          <button type="button"
+            class="interaction-btn border border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white px-3 py-1 rounded-full text-sm flex items-center gap-1 transition"
+            data-like="{{ idee.id }}">
+            {% if idee.likes | selectattr("utilisateur_id", "equalto", current_user.id) | list | length > 0 %}
+              ❤️ {{ idee.likes|length }}
+            {% else %}
+              🤍 {{ idee.likes|length }}
+            {% endif %}
+          </button>
+
+          <button class="toggle-commentaires border border-blue-800 text-blue-800 hover:bg-blue-800 hover:text-white px-3 py-1 rounded-full text-sm transition"
+                  data-id="{{ idee.id }}">
+            💬 {{ idee.commentaires|length }} commentaire{{ 's' if idee.commentaires|length > 1 }}
+          </button>
+
+      </div>
+
+         <!-- Commentaire -->
+      <div class="mt-4 hidden" id="commentaires-idee-{{ idee.id }}">
+         <form method="POST" action="/commentaire/{{ idee.id }}" class="mt-4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <textarea name="contenu" rows="2" placeholder="Ajouter un commentaire..." required
+            class="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          <button type="submit"
+            class="mt-2 bg-blue-800 hover:bg-blue-700 text-white px-4 py-1 rounded-full transition">
+            Commenter
+          </button>
+         </form>
+
+        {% for commentaire in idee.commentaires %}
+          <div class="bg-gray-100 p-2 mt-2 rounded">
+            <strong>{{ commentaire.utilisateur.email }}</strong> : {{ commentaire.contenu }}<br>
+            <small class="text-gray-500">{{ commentaire.date_commentaire.strftime('%d/%m/%Y %H:%M') }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <p class="text-gray-500 italic">Aucune idée publiée pour l’instant.</p>
+  {% endfor %}
+
+  <script>
+  document.querySelectorAll(".toggle-commentaires").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const bloc = document.getElementById("commentaires-idee-" + id);
+      if (bloc) {
+        bloc.style.display = bloc.style.display === "none" || bloc.style.display === "" ? "block" : "none";
+      }
+    });
+  });
+</script>
+
+</div>
+{% endblock %}
+

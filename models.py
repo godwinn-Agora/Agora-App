@@ -21,11 +21,16 @@ class Idee(db.Model):
 
 class Utilisateur(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    nom_affiche = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(150), nullable=False, unique=True)
     mot_de_passe = db.Column(db.String(200), nullable=False)
     date_creation = db.Column(db.DateTime, default=datetime.utcnow)
     likes = db.relationship("Like", backref="utilisateur")
     commentaires = db.relationship("Commentaire", backref="utilisateur", cascade="all, delete-orphan")
+    photo = db.Column(db.String(200), default='default.jpg') # lien ou nom de fichier
+    bio = db.Column(db.Text, default='')
+    centres_interet = db.Column(db.Text, default='')
 
     def __repr__(self):
         return f"<Utilisateur {self.id} - {self.email}>"
