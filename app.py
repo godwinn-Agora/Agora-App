@@ -155,6 +155,7 @@ def inscription():
 
         nouvel_utilisateur = Utilisateur(
             username=username,
+            nom_affiche=username,
             email=email,
             mot_de_passe=mot_de_passe_hash,
             date_creation=datetime.utcnow()

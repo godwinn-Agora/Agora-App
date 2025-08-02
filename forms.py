@@ -27,11 +27,6 @@ class InscriptionForm(FlaskForm):
         DataRequired(),
         Length(min=3, max=80)
     ])
-    nom_affiche = StringField("Nom affiché", validators=[
-        DataRequired(),
-        Length(min=3, max=80)
-    ])
-    submit = SubmitField("S'inscrire")
 
 
 class IdeeForm(FlaskForm):
