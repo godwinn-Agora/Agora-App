@@ -24,22 +24,26 @@
 
   {% if current_user.is_authenticated %}
   <form method="POST" action="/" class="mb-8 space-y-4 bg-white p-6 rounded-lg shadow">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ form.hidden_tag() }}
 
     <div>
-      <label for="titre" class="block font-semibold mb-1 text-blue-900">Titre :</label>
-      <input type="text" name="titre" id="titre" maxlength="100" required
-             class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <label for="{{ form.titre.id }}" class="block font-semibold mb-1 text-blue-900">Titre :</label>
+      {{ form.titre(class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+      {% for error in form.titre.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+      {% endfor %}
     </div>
 
     <div>
-      <label for="contenu" class="block font-semibold mb-1 text-blue-900">Expliquez votre idée :</label>
-      <textarea name="contenu" id="contenu" maxlength="1000" rows="4" required
-                class="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      <label for="{{ form.contenu.id }}" class="block font-semibold mb-1 text-blue-900">Expliquez votre idée :</label>
+      {{ form.contenu(class="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+      {% for error in form.contenu.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+      {% endfor %}
     </div>
 
-    <input type="submit" value="Soumettre l'idée"
-           class="w-full cursor-pointer bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 rounded transition" />
+     {{ form.submit(class="w-full cursor-pointer bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 rounded transition") }}
+
   </form>
 
   <h2 class="text-2xl font-bold mb-6 text-blue-900">🔥 Top idées les plus populaires</h2>
@@ -75,6 +79,18 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <textarea name="contenu" rows="2" required placeholder="Ajouter un commentaire..."
                     class="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          {% with messages = get_flashed_messages(category_filter=['error']) %}
+            {% if messages %}
+              <div class="mb-4">
+                {% for message in messages %}
+                  <p class="text-red-500 text-sm mt-1">{{ message }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+            {% for error in form.contenu.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
           <button type="submit"
                   class="border border-blue-900 text-blue-900 text-sm py-1 px-4 rounded-full hover:bg-blue-900 hover:text-white transition w-full">
             Commenter

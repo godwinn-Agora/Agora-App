@@ -10,11 +10,17 @@
         <label for="{{ form.titre.id }}" class="font-semibold">Titre :</label>
         {{ form.titre(class="w-full mt-1 border border-gray-300 rounded p-2") }}
       </div>
+      {% for error in form.titre.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+      {% endfor %}
 
       <div>
         <label for="{{ form.contenu.id }}" class="font-semibold">Expliquez votre idée :</label>
         {{ form.contenu(class="w-full mt-1 border border-gray-300 rounded p-2") }}
       </div>
+      {% for error in form.contenu.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+      {% endfor %}
 
       {{ form.submit(class="bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-full") }}
     </form>
@@ -55,6 +61,18 @@
           <form method="POST" action="/commentaire/{{ idee.id }}" class="mt-4">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <textarea name="contenu" rows="2" class="w-full p-2 border border-gray-300 rounded" placeholder="Ajouter un commentaire..." required></textarea>
+            {% with messages = get_flashed_messages(category_filter=['error']) %}
+            {% if messages %}
+              <div class="mb-4">
+                {% for message in messages %}
+                  <p class="text-red-500 text-sm mt-1">{{ message }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+            {% for error in form.contenu.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
             <button class="mt-2 bg-blue-800 hover:bg-blue-700 text-white px-4 py-1 rounded-full" type="submit">Commenter</button>
           </form>
 

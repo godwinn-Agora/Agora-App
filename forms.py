@@ -30,14 +30,16 @@ class InscriptionForm(FlaskForm):
 
     submit = SubmitField("S'inscrire")
 
+
 class IdeeForm(FlaskForm):
-    titre = StringField("Titre", validators=[DataRequired(), Length(max=100)])
-    contenu = TextAreaField("Contenu", validators=[DataRequired(), Length(max=1000)])
+    titre = StringField("Titre", validators=[DataRequired(), Length(min=3, max=100)])
+    contenu = TextAreaField("Contenu", validators=[DataRequired(), Length(min=10, max=1000)])
     submit = SubmitField("Soumettre l'idée")
 
 
 class CommentaireForm(FlaskForm):
-    contenu = TextAreaField("Contenu", validators=[DataRequired(), Length(max=500)])
+    contenu = TextAreaField("Contenu", validators=[
+        DataRequired(), Length(min=5, max=500, message="Le commentaire doit contenir entre 5 et 500 caractères.")])
     submit = SubmitField("Commenter")
 
 

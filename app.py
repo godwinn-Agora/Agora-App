@@ -247,9 +247,11 @@ def commentaire(idee_id):
         db.session.commit()
         flash("Commentaire ajouté avec succès.", "success")
         return redirect("/")
-
-    flash("Commentaire invalide.", "error")
-    return redirect("/")
+    else:
+        # Nouvelle ligne : messages d'erreur du champ 'contenu'
+        for error in form.contenu.errors:
+            flash(error, "error")  # Ce seront des messages précis (ex: "entre 5 et 500 caractères.")
+        return redirect("/")
 
 
 """@app.route("/mes-idees")
