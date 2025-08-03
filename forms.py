@@ -28,6 +28,7 @@ class InscriptionForm(FlaskForm):
         Length(min=3, max=80)
     ])
 
+    submit = SubmitField("S'inscrire")
 
 class IdeeForm(FlaskForm):
     titre = StringField("Titre", validators=[DataRequired(), Length(max=100)])
