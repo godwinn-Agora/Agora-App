@@ -272,7 +272,7 @@ def toutes_les_idees():
 def idees_populaires():
     idees = Idee.query.all()
     idees_tries = sorted(idees, key=lambda i: len(i.likes), reverse=True)
-    return render_template("idees_populaires.html", idees=idees_tries)
+    return render_template("idees_populaires.html", idees=idees_tries, form=None)
 
 
 @app.route("/api/like/<int:idee_id>", methods=["POST"])
@@ -371,7 +371,7 @@ def profil(username):
     idees = Idee.query.filter_by(utilisateur_id=user.id).order_by(Idee.date_creation.desc()).all()
 
     # 3. Renvoyer vers template avec les infos
-    return render_template('profil.html', utilisateur=user, idees=idees)
+    return render_template('profil.html', utilisateur=user, idees=idees, form=None)
 
 
 @login_manager.user_loader

@@ -23,28 +23,26 @@
   {% endwith %}
 
   {% if current_user.is_authenticated %}
-  <form method="POST" action="/" class="mb-8 space-y-4 bg-white p-6 rounded-lg shadow">
+  <form method="POST" action="/" class="space-y-4 bg-white shadow-md rounded-lg p-6 mb-8">
       {{ form.hidden_tag() }}
-
-    <div>
-      <label for="{{ form.titre.id }}" class="block font-semibold mb-1 text-blue-900">Titre :</label>
-      {{ form.titre(class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+      <div>
+        <label for="{{ form.titre.id }}" class="font-semibold">Titre :</label>
+        {{ form.titre(class="w-full mt-1 border border-gray-300 rounded p-2") }}
+      </div>
       {% for error in form.titre.errors %}
         <p class="text-red-500 text-sm mt-1">{{ error }}</p>
       {% endfor %}
-    </div>
 
-    <div>
-      <label for="{{ form.contenu.id }}" class="block font-semibold mb-1 text-blue-900">Expliquez votre idée :</label>
-      {{ form.contenu(class="w-full p-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500") }}
+      <div>
+        <label for="{{ form.contenu.id }}" class="font-semibold">Expliquez votre idée :</label>
+        {{ form.contenu(class="w-full mt-1 border border-gray-300 rounded p-2") }}
+      </div>
       {% for error in form.contenu.errors %}
         <p class="text-red-500 text-sm mt-1">{{ error }}</p>
       {% endfor %}
-    </div>
 
-     {{ form.submit(class="w-full cursor-pointer bg-blue-900 hover:bg-blue-700 text-white font-bold py-2 rounded transition") }}
-
-  </form>
+      {{ form.submit(class="bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-full") }}
+    </form>
 
   <h2 class="text-2xl font-bold mb-6 text-blue-900">🔥 Top idées les plus populaires</h2>
 
