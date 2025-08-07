@@ -35,6 +35,11 @@ class InscriptionForm(FlaskForm):
 class IdeeForm(FlaskForm):
     titre = StringField("Titre", validators=[DataRequired(), Length(min=3, max=100)])
 
+    def validate_contenu(self, field):
+        cleaned = field.data.strip()
+        if len(cleaned) < 10:
+            raise ValidationError("Le contenu doit faire au moins 10 caractères significatifs (hors espaces).")
+
     def pas_vide_apres_strip(form, field):
         if not field.data or not field.data.strip():
             raise ValidationError("Le contenu ne peut pas être vide ou fait uniquement d'espaces.")
@@ -49,6 +54,12 @@ class IdeeForm(FlaskForm):
 
 
 class CommentaireForm(FlaskForm):
+
+    def validate_contenu(self, field):
+        cleaned = field.data.strip()
+        if len(cleaned) < 5:
+            raise ValidationError("Le commentaire doit faire au moins 5 caractères significatifs (hors espaces).")
+
     def pas_vide_apres_strip(form, field):
         if not field.data or not field.data.strip():
             raise ValidationError("Le commentaire ne peut pas être vide ou fait uniquement d'espaces.")

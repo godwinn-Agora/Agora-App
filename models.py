@@ -12,7 +12,7 @@ class Idee(db.Model):
     utilisateur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'))
     date_creation = db.Column(db.DateTime, default=datetime.utcnow)
     utilisateur = db.relationship("Utilisateur", backref="idees")
-    likes = db.relationship("Like", backref="idee")
+    likes = db.relationship("Like", backref="idee", cascade="all, delete-orphan", lazy=True)
     commentaires = db.relationship("Commentaire", backref="idee", cascade="all, delete-orphan")
 
     def __repr__(self):
