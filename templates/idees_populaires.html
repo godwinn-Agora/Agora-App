@@ -118,7 +118,7 @@
   document.querySelectorAll(".toggle-commentaires").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
-      const bloc = document.getElementById("commentaires-" + id);
+      const bloc = document.getElementById("commentaires-" + idee.id);
       if (bloc) bloc.classList.toggle("hidden");
     });
   });

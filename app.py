@@ -272,7 +272,8 @@ def toutes_les_idees():
 def idees_populaires():
     idees = Idee.query.all()
     idees_tries = sorted(idees, key=lambda i: len(i.likes), reverse=True)
-    return render_template("idees_populaires.html", idees=idees_tries, form=None)
+    form = IdeeForm()
+    return render_template("idees_populaires.html", idees=idees_tries, form=form)
 
 
 @app.route("/api/like/<int:idee_id>", methods=["POST"])
@@ -370,8 +371,9 @@ def profil(username):
     # 2. Récupérer SES idées (celles du profil visité)
     idees = Idee.query.filter_by(utilisateur_id=user.id).order_by(Idee.date_creation.desc()).all()
 
+    form = IdeeForm()
     # 3. Renvoyer vers template avec les infos
-    return render_template('profil.html', utilisateur=user, idees=idees, form=None)
+    return render_template('profil.html', utilisateur=user, idees=idees, form=form)
 
 
 @login_manager.user_loader
