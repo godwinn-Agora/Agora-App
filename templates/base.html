@@ -25,9 +25,24 @@
 
   <style>
     body { font-family: 'Inter', sans-serif; }
+    /* Empêcher le débordement horizontal */
+    html, body {
+      overflow-x: hidden;
+    }
+
+    /* Rendre toutes les images adaptatives */
+    img, svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Casser les mots trop longs */
+    * {
+      word-wrap: break-word;
+    }
   </style>
 </head>
-<body class="bg-[#f0f2f5] text-[#333]">
+<body class="bg-[#f0f2f5] text-[#333] overflow-x-hidden">
 
   <!-- ✅ Navbar unique et centralisée -->
   {% include "_navbar.html" %}
