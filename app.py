@@ -56,10 +56,10 @@ login_manager.init_app(app)
 
 
 @app.route("/", methods=["GET", "POST"])
-@login_required
 def index():
-    print("Connecté ? ->", current_user.is_authenticated)
-    print("Utilisateur ->", current_user.email if current_user.is_authenticated else "None")
+    if not current_user.is_authenticated:
+        return render_template("accueil.html")
+
     form = IdeeForm()
     if form.validate_on_submit():
         titre = form.titre.data
